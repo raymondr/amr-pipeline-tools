@@ -63,6 +63,11 @@ def main():
                 if ids[0][0] == id:
                     true_positive += 1
                 else:
+                    print("False Positive: %s, %s" % (name, id))
+                    for i in range(len(ids)):
+                        print("Attempt %d: %s %f" % (i, ids[i][0], ids[i][1]))
+                        if ids[i][0] == id:
+                            break
                     #print("%s,%s,%s" % (name, id, ids[0][0]))
                     false_positive += 1
                 #if name not in scan_id_to_name[id]:
