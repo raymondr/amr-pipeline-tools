@@ -37,7 +37,7 @@ def main():
         print("Usage: test.py grouping.csv scanresults.scan")
         sys.exit(0)
 
-    id_to_name = readers.read_grouping(sys.argv[1])
+    id_to_name = readers.read_grouping(sys.argv[1], short=True)
     thresh = []
     fp = []
     tp = []

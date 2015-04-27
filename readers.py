@@ -27,7 +27,7 @@ def read_fasta(file='../master_AMRdb.fa', shorten=False):
     return map
 
 
-def read_grouping(filename='../grouping.csv'):
+def read_grouping(filename='../grouping.csv', short=False):
     with open(filename) as f:
         lines = f.readlines()
     id_to_name = {}
@@ -37,6 +37,8 @@ def read_grouping(filename='../grouping.csv'):
         id = id.strip()
         id = ''.join(id.split(':'))
         name = name.strip('"').strip()
+        if short and ' ' in name:
+            name = name.split()[0]
         if id not in id_to_name:
             id_to_name[id] = [name]
         else:
