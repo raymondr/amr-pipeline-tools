@@ -42,11 +42,9 @@ def main():
     fp = []
     tp = []
     nf = []
-    for threshold in range(0, 1, 100):
-        #print("Threshold: %d" % threshold)
+    for threshold in range(0, 10, 100):
         scan_id_to_name, scan_name_to_id = readers.read_scan_results(threshold, sys.argv[2])
-
-        #print("Genes not found by HMM")
+        found_score = []
         true_positive = 0
         false_positive = 0
         not_found = 0
@@ -62,46 +60,29 @@ def main():
                 ids.sort(key=lambda l: l[1], reverse=True)
                 if ids[0][0] == id:
                     true_positive += 1
+                    found_score.append((ids[0][1], id, name))
                 else:
                     print("False Positive: %s, %s" % (name, id))
                     for i in range(len(ids)):
                         print("Attempt %d: %s %f" % (i, ids[i][0], ids[i][1]))
                         if ids[i][0] == id:
+                            found_score.append((ids[i][1], id, name))
                             break
-                    #print("%s,%s,%s" % (name, id, ids[0][0]))
                     false_positive += 1
-                #if name not in scan_id_to_name[id]:
-                #    #print(name, id)
-                #    false_negative += 1
-                #else:
-                #    scan_id_to_name[id].remove(name)
 
-        #print("True positive: %d" % ((true_positive * 100.0) / total))
-        #matches = [(len(scan_id_to_name[id]), id, scan_id_to_name[id]) for id in scan_id_to_name.keys()]
-        #matches.sort(reverse=True)
-        #for i in range(40):
-        #    print(matches[i])
 
-        #false_positive = 0
-        #for id in scan_id_to_name.keys():
-        #    if len(scan_id_to_name[id]):
-        #        #print scan_id_to_name[id]
-        #        false_positive += len(scan_id_to_name[id])
-
-        #print("False positive: %d" %  ((false_positive * 100.0) / total))
         thresh.append(threshold)
-        #tp.append((true_positive * 100.0) / total)
-        #fp.append((false_positive * 100.0) / total)
         tp.append(true_positive)
         fp.append(false_positive)
         nf.append(not_found)
-        #print(threshold, true_positive, false_positive, not_found, total)
 
     x = np.array(fp)# false_positive_rate
     y = np.array(tp)# true_positive_rate
     t = np.array(thresh)
     n = np.array(nf)
 
+    found_score.sort()
+    print(found_score)
     print(x, y, t, n)
     graph(x, y, t, n)
 

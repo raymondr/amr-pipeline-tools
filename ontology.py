@@ -1,26 +1,32 @@
-# From the grouping file, determine how many genes fall into each general category from CARD ontology
+# From a csv file, determine how many genes fall into each general category from CARD ontology
 import ontology_common
+import sys
 
 
 def get_inclusions():
-    #with open('../combined_grouping.csv') as f:
-    with open('/tmp/cluster') as f:
+    with open(sys.argv[1]) as f:
         lines = f.readlines()
     ids = []
     for line in lines:
         line = line.rstrip('\n')
-        name, id = line.rsplit(',', 1)
-        id = id.strip()
-        ids.append(id)
+        if sys.argv[2] == '--count':
+            id, cnt = line.split(',')
+            id = id.replace('ARO', 'ARO:')
+            for i in range(int(cnt)):
+                ids.append(id)
+        else:
+            name, id = line.rsplit(',', 1)
+            id = id.strip()
+            ids.append(id)
     return ids
 
 
-def categories():
+def categories(terms):
     # read in file of genes to include
     include = get_inclusions()
     count_by_category = {}
     for id in include:
-        category = get_category(id)
+        category = get_category(id, terms)
         if category:
             name = category['name'][0]
         elif id.startswith('ARO:4'):
@@ -44,7 +50,7 @@ def categories():
         print('%s, %s, %d' % (m[0], m[1], float(m[1]) * 100.0 / total))
 
 
-def get_category(id):
+def get_category(id, terms):
         t_id = id
         while t_id:
             if t_id in terms:
@@ -64,5 +70,11 @@ def get_category(id):
                 #print("%s not found in terms" % t_id)
                 return None
 
-terms = ontology_common.parse_obo('../new_combined.obo')
-categories()
+
+def main():
+    terms = ontology_common.parse_obo('../new_combined.obo')
+    categories(terms)
+
+
+if __name__ == '__main__':
+    main()
