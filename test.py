@@ -19,14 +19,14 @@ def graph(x, y, t, n):
     plt.show()
     '''
 
-    width = 20
+    width = 5
     b1 = plt.bar(t, y, width, color='g')
     b2 = plt.bar(t, x, width, bottom=y, color='r')
     b3 = plt.bar(t, n, width, bottom=y+x, color='b')
     plt.title("How classification varies with threshold")
     plt.ylabel("Number of genes")
     plt.xlabel("Threshold")
-    plt.legend((b1[0], b2[0], b3[0]), ('True Positive', 'False Positive', 'Not Classified'))
+    plt.legend((b1[0], b2[0], b3[0]), ('True Positive', 'False Positive', 'Not Classified'),loc=4)
     plt.show()
     # This is the AUC
     auc = np.trapz(y,x)
