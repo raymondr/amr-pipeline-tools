@@ -12,6 +12,7 @@ def get_counts(filename):
         line = line.rstrip('\n')
         id, cnt = line.split(',')
         id = id.replace('ARO', 'ARO:')
+        id = id.split('s')[0]
         ids.append((id, int(cnt)))
     return ids
 

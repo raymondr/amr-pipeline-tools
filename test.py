@@ -45,6 +45,7 @@ def main():
     for threshold in range(0, 10, 100):
         scan_id_to_name, scan_name_to_id = readers.read_scan_results(threshold, sys.argv[2])
         found_score = []
+        mismatch = {}
         true_positive = 0
         false_positive = 0
         not_found = 0
@@ -58,16 +59,19 @@ def main():
                     continue
                 ids = scan_name_to_id[name]
                 ids.sort(key=lambda l: l[1], reverse=True)
-                if ids[0][0] == id:
+                if ids[0][0] == id or ids[0][0].split('s')[0] == id.split('s')[0]:
                     true_positive += 1
                     found_score.append((ids[0][1], id, name))
                 else:
                     print("False Positive: %s, %s" % (name, id))
-                    for i in range(len(ids)):
-                        print("Attempt %d: %s %f" % (i, ids[i][0], ids[i][1]))
-                        if ids[i][0] == id:
-                            found_score.append((ids[i][1], id, name))
-                            break
+                    if ids[1][0] == id:
+                        mismatch[id] = ids[0][0]
+                    else:
+                        for i in range(len(ids)):
+                            print("Attempt %d: %s %f" % (i, ids[i][0], ids[i][1]))
+                            if ids[i][0] == id:
+                                found_score.append((ids[i][1], id, name))
+                                break
                     false_positive += 1
 
 
@@ -83,6 +87,7 @@ def main():
 
     found_score.sort()
     print(found_score)
+    print(mismatch)
     print(x, y, t, n)
     graph(x, y, t, n)
 
