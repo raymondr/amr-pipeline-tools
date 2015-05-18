@@ -13,7 +13,7 @@ for hmm, score in hmm_to_score.items():
         lines = f.readlines()
     thresh = min(int(score), 700)
     cutoff = 'GA %d %d;\n' % (thresh, thresh)
-    newlines = lines[:15] + [cutoff] + lines[15:]
+    newlines = lines[:14] + [cutoff] + lines[14:]
     filename2 = '%s/%s.hmm' % (sys.argv[3], hmm)
     with open(filename2, mode='w') as r:
         r.writelines(newlines)
