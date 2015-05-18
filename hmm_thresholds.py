@@ -1,0 +1,15 @@
+import sys
+
+with open(sys.argv[1]) as f:
+    lines = f.readlines()
+for line in lines:
+    hmm, score = line.split(',')
+    filename = '%s/%s.hmm' % (sys.argv[2], hmm)
+    with open(filename) as f:
+        lines = f.readlines()
+    thresh = min(int(score), 700)
+    cutoff = 'GA %d %d;\n' % (thresh, thresh)
+    newlines = lines[:15] + [cutoff] + lines[15:]
+    filename2 = '%s/%s.hmm' % (sys.argv[3], hmm)
+    with open(filename2, mode='w') as r:
+        r.writelines(newlines)

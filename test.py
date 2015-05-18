@@ -1,12 +1,14 @@
 # read in mapping file and master.scan
 # output all the genes that were not found by their hmm
-# output all the genes that were found by multiple hmm (other than their own) ordered by number. Perhaps these genes encode their genes
+# output all the genes that were found by multiple hmm (other than their own) ordered by number.
+# Perhaps these genes encode their genes
 # output all the hmm that found more than their content ordered by number. Perhaps these hmms are too broad
 
 import matplotlib.pyplot as plt
 import numpy as np
 import readers
 import sys
+import pickle
 
 
 def graph(x, y, t, n):
@@ -33,8 +35,8 @@ def graph(x, y, t, n):
 
 
 def main():
-    if len(sys.argv) != 3:
-        print("Usage: test.py grouping.csv scanresults.scan")
+    if len(sys.argv) != 4:
+        print("Usage: test.py grouping.csv scanresults.scan threshold.csv")
         sys.exit(0)
 
     id_to_name = readers.read_grouping(sys.argv[1], short=True)
@@ -64,7 +66,7 @@ def main():
                     found_score.append((ids[0][1], id, name))
                 else:
                     print("False Positive: %s, %s" % (name, id))
-                    if ids[1][0] == id:
+                    if len(ids) > 1 and ids[1][0] == id:
                         mismatch[id] = ids[0][0]
                     else:
                         for i in range(len(ids)):
@@ -86,10 +88,12 @@ def main():
     n = np.array(nf)
 
     found_score.sort()
-    print(found_score)
+    with open(sys.argv[3], 'w') as f:
+        for score, hmm, name in found_score:
+            f.write('%s,%d\n' % (hmm, score - 1))
     print(mismatch)
     print(x, y, t, n)
-    graph(x, y, t, n)
+    #graph(x, y, t, n)
 
 if __name__ == '__main__':
     main()
