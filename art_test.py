@@ -33,8 +33,8 @@ def search(name, id, scan_name_to_id):
     return ids
 
 def main():
-    if len(sys.argv) != 4:
-        print("Usage: art_test.py grouping.csv scanresults.scan art_out.maf")
+    if len(sys.argv) != 5:
+        print("Usage: art_test.py grouping.csv scanresults.scan art_out.maf scores.csv")
         sys.exit(0)
 
     id_to_name = readers.read_grouping(sys.argv[1])
@@ -46,6 +46,7 @@ def main():
     for threshold in range(0, 10, 20):
         scan_id_to_name, scan_name_to_id = readers.read_scan_results(threshold, sys.argv[2])
         scan_name_to_id = substitute_read_name(scan_name_to_id, contig_to_read)
+        found_score = []
         true_positive = 0
         false_positive = 0
         not_found = 0
@@ -57,11 +58,13 @@ def main():
                 if ids:
                     if ids[0][0] == id:
                         true_positive += 1
+                        found_score.append((ids[0][1], id, name))
                     else:
                         print("False Positive: %s, %s" % (name, id))
                         for i in range(len(ids)):
                             print("Attempt %d: %s %f" % (i, ids[i][0], ids[i][1]))
                             if ids[i][0] == id:
+                                found_score.append((ids[i][1], id, name))
                                 break
                         false_positive += 1
                 else:
@@ -80,6 +83,11 @@ def main():
     y = np.array(tp)# true_positive_rate
     t = np.array(thresh)
     n = np.array(nf)
+
+    found_score.sort()
+    with open(sys.argv[4], 'w') as f:
+        for score, hmm, name in found_score:
+            f.write('%s,%d\n' % (hmm, score - 1))
 
     test.graph(x, y, t, n)
 
