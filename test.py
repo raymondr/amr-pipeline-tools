@@ -47,7 +47,7 @@ def main():
     for threshold in range(0, 10, 100):
         scan_id_to_name, scan_name_to_id = readers.read_scan_results(threshold, sys.argv[2])
         found_score = []
-        mismatch = {}
+        mismatch = []
         true_positive = 0
         false_positive = 0
         not_found = 0
@@ -67,13 +67,16 @@ def main():
                 else:
                     print("False Positive: %s, %s" % (name, id))
                     if len(ids) > 1 and ids[1][0] == id:
-                        mismatch[id] = ids[0][0]
+                        mismatch.append((id, ids[0][0]))
                     else:
                         for i in range(len(ids)):
                             print("Attempt %d: %s %f" % (i, ids[i][0], ids[i][1]))
                             if ids[i][0] == id:
                                 found_score.append((ids[i][1], id, name))
                                 break
+                            else:
+                                mismatch.append((id, ids[i][0]))
+
                     false_positive += 1
 
 
@@ -91,7 +94,10 @@ def main():
     with open(sys.argv[3], 'w') as f:
         for score, hmm, name in found_score:
             f.write('%s,%d\n' % (hmm, score - 1))
-    print(mismatch)
+    with open('mismatch.csv', 'w') as f:
+        f.write('Actual Gene,Identified Gene\n')
+        for a, b in mismatch:
+            f.write('%s,%s\n' % (a, b))
     print(x, y, t, n)
     #graph(x, y, t, n)
 
