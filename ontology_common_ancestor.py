@@ -78,7 +78,7 @@ def fill_children(node, nodes, terms):
 
 
 def main():
-    terms = ontology_common.parse_obo('../new_combined.obo')
+    terms = ontology_common.parse_obo('new_combined.obo')
     with open('mismatch.csv') as f:
         headers = f.readline()
         print("Actual, Identified As, Common Class, Common Class Description")
