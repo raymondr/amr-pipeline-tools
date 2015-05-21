@@ -81,12 +81,12 @@ def main():
     terms = ontology_common.parse_obo('new_combined.obo')
     with open('mismatch.csv') as f:
         headers = f.readline()
-        print("Actual, Identified As, Common Class, Common Class Description")
+        print("Gene,Expected ID,Found ID,Common Class,Common Class Description")
         while True:
             line = f.readline()
             if not line:
                 break
-            actual, id = line.strip().split(',')
+            name, actual, id = line.strip().split(',')
             id = id.replace('ARO', 'ARO:')
             id = id.split('s')[0]
             actual = actual.replace('ARO', 'ARO:')
@@ -96,7 +96,7 @@ def main():
             for p in get_lineage(actual, terms):
                 if p in id_parents:
                     description = terms[p]['def'][0] if terms.get(p) else "No Description"
-                    print('%s,%s,%s,%s' % (id, actual, p, description))
+                    print('%s,%s,%s,%s,%s' % (name, id, actual, p, description))
                     break
 
 

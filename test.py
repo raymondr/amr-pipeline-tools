@@ -67,7 +67,7 @@ def main():
                 else:
                     print("False Positive: %s, %s" % (name, id))
                     if len(ids) > 1 and ids[1][0] == id:
-                        mismatch.append((id, ids[0][0]))
+                        mismatch.append((name, id, ids[0][0]))
                     else:
                         for i in range(len(ids)):
                             print("Attempt %d: %s %f" % (i, ids[i][0], ids[i][1]))
@@ -75,7 +75,7 @@ def main():
                                 found_score.append((ids[i][1], id, name))
                                 break
                             else:
-                                mismatch.append((id, ids[i][0]))
+                                mismatch.append((name, id, ids[i][0]))
 
                     false_positive += 1
 
@@ -95,9 +95,9 @@ def main():
         for score, hmm, name in found_score:
             f.write('%s,%d\n' % (hmm, score - 1))
     with open('mismatch.csv', 'w') as f:
-        f.write('Actual Gene,Identified Gene\n')
-        for a, b in mismatch:
-            f.write('%s,%s\n' % (a, b))
+        f.write('Gene,Expected ID,Found ID\n')
+        for a, b, c in mismatch:
+            f.write('%s,%s,%s\n' % (a, b, c))
     print(x, y, t, n)
     #graph(x, y, t, n)
 
