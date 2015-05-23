@@ -43,7 +43,7 @@ def main():
     tp = []
     nf = []
     contig_to_read = readers.read_maf(sys.argv[3])
-    for threshold in range(0, 700, 100):
+    for threshold in range(0, 800, 100):
         scan_id_to_name, scan_name_to_id = readers.read_scan_results(threshold, sys.argv[2])
         scan_name_to_id = substitute_read_name(scan_name_to_id, contig_to_read)
         found_score = []
