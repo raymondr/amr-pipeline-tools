@@ -86,7 +86,7 @@ def main():
             line = f.readline()
             if not line:
                 break
-            name, actual, id = line.strip().split(',')
+            name, id, actual = line.strip().split(',')
             id = id.replace('ARO', 'ARO:')
             id = id.split('s')[0]
             actual = actual.replace('ARO', 'ARO:')

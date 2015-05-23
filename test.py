@@ -89,6 +89,7 @@ def main():
     y = np.array(tp)# true_positive_rate
     t = np.array(thresh)
     n = np.array(nf)
+    total = x + y + n
 
     found_score.sort()
     with open(sys.argv[3], 'w') as f:
@@ -98,7 +99,7 @@ def main():
         f.write('Gene,Expected ID,Found ID\n')
         for a, b, c in mismatch:
             f.write('%s,%s,%s\n' % (a, b, c))
-    print(x, y, t, n)
+    print("misclassified %d notfound %d true positive %d of total %d" % (x, n, y, total))
     #graph(x, y, t, n)
 
 if __name__ == '__main__':

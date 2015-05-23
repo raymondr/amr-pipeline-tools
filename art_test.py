@@ -56,7 +56,7 @@ def main():
                 total += 1
                 ids = search(name, id, scan_name_to_id)
                 if ids:
-                    if ids[0][0] == id:
+                    if ids[0][0] == id or ids[0][0].split('s')[0] == id.split('s')[0]:
                         true_positive += 1
                         found_score.append((ids[0][1], id, name))
                     else:
@@ -78,6 +78,8 @@ def main():
         tp.append(true_positive)
         fp.append(false_positive)
         nf.append(not_found)
+        print("misclassified %d notfound %d true positive %d of total %d" % (fp, nf, tp, total))
+
         print(threshold, true_positive, false_positive, not_found, total)
     x = np.array(fp)# false_positive_rate
     y = np.array(tp)# true_positive_rate
