@@ -43,7 +43,7 @@ def main():
     tp = []
     nf = []
     contig_to_read = readers.read_maf(sys.argv[3])
-    for threshold in range(0, 10, 20):
+    for threshold in range(0, 700, 100):
         scan_id_to_name, scan_name_to_id = readers.read_scan_results(threshold, sys.argv[2])
         scan_name_to_id = substitute_read_name(scan_name_to_id, contig_to_read)
         found_score = []
@@ -78,7 +78,10 @@ def main():
         tp.append(true_positive)
         fp.append(false_positive)
         nf.append(not_found)
-        print("misclassified %d notfound %d true positive %d of total %d" % (fp, nf, tp, total))
+        print("misclassified %d notfound %d true positive %d of total %d" % (false_positive,
+                                                                             not_found,
+                                                                             true_positive,
+                                                                             total))
 
         print(threshold, true_positive, false_positive, not_found, total)
     x = np.array(fp)# false_positive_rate
