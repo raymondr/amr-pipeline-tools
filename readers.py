@@ -46,7 +46,7 @@ def read_grouping(filename='../grouping.csv', short=False):
     return id_to_name
 
 
-def read_scan_results(threshold, filename, key=False):
+def read_scan_results(threshold, filename, key=False, protein=False):
     with open(filename) as f:
         lines = f.readlines()
     scan_id_to_name = {}
@@ -57,9 +57,16 @@ def read_scan_results(threshold, filename, key=False):
         fields = line.split()
         target = fields[0]
         query = fields[2]
-        start = int(fields[5])
-        end = int(fields[6])
-        score = float(fields[13])
+        if protein:
+            start = ' '.join(fields[17:])
+            target = fields[-1].strip('[]')
+            print(target)
+            end = int(0)
+            score = float(fields[5])
+        else:
+            start = int(fields[5])
+            end = int(fields[6])
+            score = float(fields[13])
         if score > threshold:
             if key:
                 loc,match,name = query.split('?')

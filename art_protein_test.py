@@ -10,13 +10,22 @@ import sys
 import test
 
 
+def read_genemark(filename):
+    with open(filename) as f:
+        lines = f.readlines()
+    genemark_to_source = {}
+    for line in lines:
+        if line.startswith('>'):
+            annot = line.split()
+            genemark_to_source[annot[0][1:]] = annot[1][1:]
+    return genemark_to_source
 
-def substitute_read_name(scan_name_to_id, contig_to_read):
+
+def substitute_read_name(scan_name_to_id, contig_to_read, genemark_to_name):
     new_name_to_id = {}
     for k, v in scan_name_to_id.items():
+        k = genemark_to_name[k]
         for name in contig_to_read[k]:
-            if name.startswith('NC_010611.6233911'):
-                pass
             new_name_to_id[name] = v
     return new_name_to_id
 
@@ -33,9 +42,11 @@ def search(name, id, scan_name_to_id):
     return ids
 
 def main():
-    if len(sys.argv) != 5:
-        print("Usage: art_test.py grouping.csv scanresults.scan art_out.maf scores.csv")
+    if len(sys.argv) != 6:
+        print("Usage: art_test.py grouping.csv scanresults.scan art_out.maf scores.csv genemark.f")
         sys.exit(0)
+
+    genemark_to_name = read_genemark(sys.argv[5])
 
     id_to_name = readers.read_grouping(sys.argv[1])
     thresh = []
@@ -43,27 +54,31 @@ def main():
     tp = []
     nf = []
     contig_to_read = readers.read_maf(sys.argv[3])
-    for threshold in range(0, 801, 100):
-        scan_id_to_name, scan_name_to_id = readers.read_scan_results(threshold, sys.argv[2])
-        scan_name_to_id = substitute_read_name(scan_name_to_id, contig_to_read)
+    for threshold in range(0, 80, 100):
+        mismatch = []
+        scan_id_to_name, scan_name_to_id = readers.read_scan_results(threshold, sys.argv[2],protein=True)
+        scan_name_to_id = substitute_read_name(scan_name_to_id, contig_to_read, genemark_to_name)
         found_score = []
         true_positive = 0
         false_positive = 0
         not_found = 0
         total = 0
         for id in sorted(id_to_name.keys()):
+            canonical_id = id.split('s')[0]
+            canonical_id = 'ARO:' + canonical_id.split('O')[1]
             for name in id_to_name[id]:
                 total += 1
                 ids = search(name, id, scan_name_to_id)
                 if ids:
-                    if ids[0][0] == id or ids[0][0].split('s')[0] == id.split('s')[0]:
+                    if ids[0][0] == canonical_id:
                         true_positive += 1
                         found_score.append((ids[0][1], id, name))
                     else:
                         print("False Positive: %s, %s" % (name, id))
                         for i in range(len(ids)):
                             print("Attempt %d: %s %f" % (i, ids[i][0], ids[i][1]))
-                            if ids[i][0] == id:
+                            mismatch.append((name, canonical_id, ids[i][0], ids[i][2]))
+                            if ids[i][0] == canonical_id:
                                 found_score.append((ids[i][1], id, name))
                                 break
                         false_positive += 1
@@ -93,6 +108,10 @@ def main():
     with open(sys.argv[4], 'w') as f:
         for score, hmm, name in found_score:
             f.write('%s,%d\n' % (hmm, score - 1))
+    with open('mismatch.csv', 'w') as f:
+        f.write('Gene,Expected ID,Found ID\n')
+        for a, b, c, d in mismatch:
+            f.write('%s,%s,%s,%s\n' % (a, b, c, d))
 
     test.graph(x, y, t, n)
 
