@@ -10,14 +10,14 @@ import sys
 import test
 
 
-
 def substitute_read_name(scan_name_to_id, contig_to_read):
     new_name_to_id = {}
     for k, v in scan_name_to_id.items():
         for name in contig_to_read[k]:
-            if name.startswith('NC_010611.6233911'):
-                pass
-            new_name_to_id[name] = v
+            if name in new_name_to_id:
+                new_name_to_id[name].append(v)
+            else:
+                new_name_to_id[name] = [v]
     return new_name_to_id
 
 
@@ -28,9 +28,16 @@ def search(name, id, scan_name_to_id):
         short_name = name
     if short_name not in scan_name_to_id:
         return None
-    ids = scan_name_to_id[short_name]
-    ids.sort(key=lambda l: l[1], reverse=True)
-    return ids
+    merged_list = []
+    for ids in scan_name_to_id[short_name]:
+        ids.sort(key=lambda l: l[1], reverse=True)
+        if ids[0][0] == id or ids[0][0].split('s')[0] == id.split('s')[0]:
+            return ids
+        else:
+            merged_list += ids
+    merged_list.sort(key=lambda l: l[1], reverse=True)
+    return merged_list
+
 
 def main():
     if len(sys.argv) != 5:
@@ -60,18 +67,18 @@ def main():
                         true_positive += 1
                         found_score.append((ids[0][1], id, name))
                     else:
-                        print("False Positive: %s, %s" % (name, id))
+                        #print("False Positive: %s, %s" % (name, id))
                         for i in range(len(ids)):
-                            print("Attempt %d: %s %f" % (i, ids[i][0], ids[i][1]))
+                            #print("Attempt %d: %s %f" % (i, ids[i][0], ids[i][1]))
                             if ids[i][0] == id:
                                 found_score.append((ids[i][1], id, name))
                                 break
                         false_positive += 1
                 else:
-                    for k,v in contig_to_read.items():
-                        if name in v:
-                            print("Found read %s in %s" % (name, k))
-                    print("Not Found: %s,%s" % (name, id))
+                    #for k,v in contig_to_read.items():
+                    #    if name in v:
+                    #        print("Found read %s in %s" % (name, k))
+                    #print("Not Found: %s,%s" % (name, id))
                     not_found += 1
 
         thresh.append(threshold)

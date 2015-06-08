@@ -17,6 +17,18 @@ def get_counts(filename):
     return ids
 
 
+def get_ids(filename):
+    with open(filename) as f:
+        lines = f.readlines()
+    ids = []
+    for line in lines:
+        id = line.rstrip('\n')
+        id = id.replace('ARO', 'ARO:')
+        id = id.split('s')[0]
+        ids.append(id)
+    return ids
+
+
 def get_lineage(id, terms):
         t_id = id
         while t_id:
@@ -77,7 +89,8 @@ def fill_children(node, nodes, terms):
         node[3] = terms[node[0]]['name'][0]
 
 
-def main():
+def doughnut():
+    # outputs json hierarchy with count used by doughnut graph
     terms = ontology_common.parse_obo('../new_combined.obo')
     counts = get_counts(sys.argv[1])
     root, nodes = build_tree(counts, terms)
@@ -86,5 +99,14 @@ def main():
     print(json.dumps(root, indent=4, separators=(',', ': ')))
 
 
+def hyperbolic_tree():
+    # outputs json hierarchy used by hyperbolic tree
+    terms = ontology_common.parse_obo('../new_combined.obo')
+    ids = get_ids(sys.argv[1])
+
+    print("code_hierarchy_data = ")
+    print(json.dumps(root, indent=4, separators=(',', ': ')))
+
+
 if __name__ == '__main__':
-    main()
+    hyperbolic_tree()

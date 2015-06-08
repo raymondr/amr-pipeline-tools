@@ -59,9 +59,8 @@ def read_scan_results(threshold, filename, key=False, protein=False):
         query = fields[2]
         if protein:
             start = ' '.join(fields[17:])
-            target = fields[-1].strip('[]')
-            print(target)
-            end = int(0)
+            target = fields[-1].strip('[]') if 'ARO' in fields[-1] else fields[1]
+            end = fields[1]
             score = float(fields[5])
         else:
             start = int(fields[5])
