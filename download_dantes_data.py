@@ -12,5 +12,5 @@ with open(filename, 'w') as f:
         id = item['Id']
         url = 'http://www.ncbi.nlm.nih.gov/nuccore/%s?report=fasta' % id
         data = Entrez.read(Entrez.efetch(db="nucleotide", id=id, rettype="gb", retmode="xml"))
-        f.write("> %s\n" % data[0]['GBSeq_definition'])
+        f.write("> %s %s\n" % (id, data[0]['GBSeq_definition']))
         f.write("%s\n" % data[0]['GBSeq_sequence'])
