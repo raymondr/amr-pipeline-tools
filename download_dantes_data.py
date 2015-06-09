@@ -14,6 +14,7 @@ with open(filename, 'w') as f:
         url = 'http://www.ncbi.nlm.nih.gov/nuccore/%s?report=fasta' % id
         data = Entrez.read(Entrez.efetch(db="nucleotide", id=id, rettype="gb", retmode="xml"))
         resistance = False
+        product = 'Unknown'
         for elem in data[0]['GBSeq_feature-table']:
             if 'GBFeature_quals' in elem:
                 for e in elem['GBFeature_quals']:
