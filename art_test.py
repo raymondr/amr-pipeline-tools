@@ -50,7 +50,8 @@ def main():
     tp = []
     nf = []
     contig_to_read = readers.read_maf(sys.argv[3])
-    for threshold in range(0, 801, 100):
+    for threshold in range(0, 81, 100):
+        mismatch = []
         scan_id_to_name, scan_name_to_id = readers.read_scan_results(threshold, sys.argv[2])
         scan_name_to_id = substitute_read_name(scan_name_to_id, contig_to_read)
         found_score = []
@@ -68,6 +69,9 @@ def main():
                         found_score.append((ids[0][1], id, name))
                     else:
                         #print("False Positive: %s, %s" % (name, id))
+                        canonical_id = 'ARO:' + id.split('s')[0].split('O')[1]
+                        canonical_id2 = 'ARO:' + ids[0][0].split('s')[0].split('O')[1]
+                        mismatch.append((name, canonical_id, canonical_id2, ids[0][2]))
                         for i in range(len(ids)):
                             #print("Attempt %d: %s %f" % (i, ids[i][0], ids[i][1]))
                             if ids[i][0] == id:
@@ -75,10 +79,10 @@ def main():
                                 break
                         false_positive += 1
                 else:
-                    #for k,v in contig_to_read.items():
-                    #    if name in v:
-                    #        print("Found read %s in %s" % (name, k))
-                    #print("Not Found: %s,%s" % (name, id))
+                    for k,v in contig_to_read.items():
+                        if name in v:
+                            print("Found read %s in %s" % (name, k))
+                    print("Not Found: %s,%s" % (name, id))
                     not_found += 1
 
         thresh.append(threshold)
@@ -100,6 +104,10 @@ def main():
     with open(sys.argv[4], 'w') as f:
         for score, hmm, name in found_score:
             f.write('%s,%d\n' % (hmm, score - 1))
+    with open('mismatch.csv', 'w') as f:
+        f.write('Gene,Expected ID,Found ID\n')
+        for a, b, c, d in mismatch:
+            f.write('%s,%s,%s\n' % (b, c, a))
 
     test.graph(x, y, t, n)
 

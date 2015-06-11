@@ -75,3 +75,27 @@ def populate_children(parent, depth=0):
                     visited[id] = True
             else:
                 print("already visited: ", id)
+
+
+def get_lineage(id, terms):
+        t_id_stack = [id]
+        yield id
+        while t_id_stack:
+            t_id = t_id_stack.pop(0)
+            if t_id in terms:
+                t = terms[t_id]
+                t['include'] = True
+                if 'is_a' in t:
+                    for is_a_node in t['is_a']:
+                        parent_id = is_a_node.split()[0]
+                        yield parent_id
+                        t_id_stack.append(parent_id)
+
+        if id.startswith('ARO:4'):
+            yield 'ARO:4'
+            yield "ARO:3000000"
+        elif id.startswith('ARO:5'):
+            yield 'ARO:5'
+            yield "ARO:3000000"
+        else:
+            yield 'Unknown'

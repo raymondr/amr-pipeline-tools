@@ -21,6 +21,21 @@ def read_genemark(filename):
     return genemark_to_source
 
 
+# since Resfams does not reliably include ARO number in description field, we need to use Resfams metadata
+# file to translate RF id to ARO id.
+def change_RF_to_ARO(scan_name_to_id):
+    rf_to_aro = {}
+    with open('resfams_metadata.txt') as f:
+        lines = f.readlines()
+    for line in lines[1:]:
+        fields = line.split('\t')
+        rf_to_aro[fields[0]] = fields[3]
+
+    for k, v in scan_name_to_id.items():
+        for item in v:
+            item[0] = rf_to_aro[item[0]]
+
+
 def substitute_read_name(scan_name_to_id, contig_to_read, genemark_to_name):
     new_name_to_id = {}
     for k, v in scan_name_to_id.items():
@@ -51,6 +66,7 @@ def search(name, id, scan_name_to_id):
     merged_list.sort(key=lambda l: l[1], reverse=True)
     return merged_list
 
+
 def main():
     if len(sys.argv) != 6:
         print("Usage: art_test.py grouping.csv scanresults.scan art_out.maf scores.csv genemark.f")
@@ -67,6 +83,7 @@ def main():
     for threshold in range(0, 80, 100):
         mismatch = []
         scan_id_to_name, scan_name_to_id = readers.read_scan_results(threshold, sys.argv[2],protein=True)
+        change_RF_to_ARO(scan_name_to_id)
         scan_name_to_id = substitute_read_name(scan_name_to_id, contig_to_read, genemark_to_name)
         found_score = []
         true_positive = 0

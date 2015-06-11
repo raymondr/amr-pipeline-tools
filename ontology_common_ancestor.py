@@ -17,33 +17,6 @@ def get_counts(filename):
     return ids
 
 
-def get_lineage(id, terms):
-        t_id = id
-        yield id
-        while t_id:
-            if t_id in terms:
-                t = terms[t_id]
-                t['include'] = True
-                if 'is_a' in t:
-                    parent_id = t['is_a'][0].split()[0]
-                    if parent_id == 'ARO:3000557':
-                        parent_id = t['is_a'][1].split()[0]
-                    yield parent_id
-                    t_id = parent_id
-                else:
-                    t_id = None
-            else:
-                t_id = None
-        if id.startswith('ARO:4'):
-            yield 'ARO:4'
-            yield "ARO:3000000"
-        elif id.startswith('ARO:5'):
-            yield 'ARO:5'
-            yield "ARO:3000000"
-        else:
-            yield 'Unknown'
-
-
 def build_tree(counts, terms):
     root = ["ARO:3000000", 0, set(), '']
     nodes = {"ARO:3000000": root}
@@ -79,9 +52,10 @@ def fill_children(node, nodes, terms):
 
 
 def get_common_ancestor(id, actual, terms):
-    for p in get_lineage(actual, terms):
-        if p in get_lineage(id, terms):
+    for p in ontology_common.get_lineage(actual, terms):
+        if p in ontology_common.get_lineage(id, terms):
             return p
+
 
 def determine_ancestor(id, actual, terms):
     if ';' in actual:
@@ -124,7 +98,7 @@ def main():
                 #description = terms[actual]['def'][0] if terms.get(actual) else "No Description"
                 print('%s,%s,%s,%s' % (name, id, actual, ancestor))
 
-    print("More general:%d, Shared grouping:%d", (more_general, shared_ancestor))
+    print("More general:%d, Shared grouping:%d" % (more_general, shared_ancestor))
 
 if __name__ == '__main__':
     main()

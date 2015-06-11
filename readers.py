@@ -55,14 +55,14 @@ def read_scan_results(threshold, filename, key=False, protein=False):
         if line[0] == '#':
             continue
         fields = line.split()
-        target = fields[0]
         query = fields[2]
         if protein:
             start = ' '.join(fields[17:])
-            target = fields[-1].strip('[]') if 'ARO' in fields[-1] else fields[1]
+            target = fields[1]
             end = fields[1]
             score = float(fields[5])
         else:
+            target = fields[0]
             start = int(fields[5])
             end = int(fields[6])
             score = float(fields[13])
@@ -76,13 +76,13 @@ def read_scan_results(threshold, filename, key=False, protein=False):
                 name = query
 
             if target not in scan_id_to_name:
-                scan_id_to_name[target] = [(name, score, start, end)]
+                scan_id_to_name[target] = [[name, score, start, end]]
             else:
-                scan_id_to_name[target].append((name, score, start, end))
+                scan_id_to_name[target].append([name, score, start, end])
             if name not in scan_name_to_id:
-                scan_name_to_id[name] = [(target, score, start, end)]
+                scan_name_to_id[name] = [[target, score, start, end]]
             else:
-                scan_name_to_id[name].append((target, score, start, end))
+                scan_name_to_id[name].append([target, score, start, end])
     return scan_id_to_name, scan_name_to_id
 
 

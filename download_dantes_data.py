@@ -14,11 +14,13 @@ with open(filename, 'w') as f:
         url = 'http://www.ncbi.nlm.nih.gov/nuccore/%s?report=fasta' % id
         data = Entrez.read(Entrez.efetch(db="nucleotide", id=id, rettype="gb", retmode="xml"))
         resistance = False
-        product = 'Unknown'
+        product = id
         for elem in data[0]['GBSeq_feature-table']:
             if 'GBFeature_quals' in elem:
                 for e in elem['GBFeature_quals']:
-                    if e['GBQualifier_name'] == 'note' and 'antibiotic resistance gene' in e['GBQualifier_value']:
+                    if e['GBQualifier_name'] == 'note' and \
+                            ('antibiotic resistance gene' in e['GBQualifier_value'] or
+                             'confers' in e['GBQualifier_value']):
                         resistance = True
                     if e['GBQualifier_name'] == 'product':
                         product = e['GBQualifier_value']
