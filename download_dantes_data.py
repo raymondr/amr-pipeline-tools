@@ -25,6 +25,6 @@ with open(filename, 'w') as f:
                     if e['GBQualifier_name'] == 'product':
                         product = e['GBQualifier_value']
                         product = '_'.join(product.split())
-        f.write("> %s_%s %s\n" % (str(resistance), product, id))
+        f.write("> %s_%s_%s\n" % (str(resistance), product, id))
         # data[0]['GBSeq_definition'])
         f.write("%s\n" % data[0]['GBSeq_sequence'])

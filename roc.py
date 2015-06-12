@@ -26,7 +26,7 @@ x1=[0.1387283237]
 x2=[0.002312138728]
 
 plt.plot(x,y)
-plt.plot(x[-1:], y[-1:],'bx')
+plt.plot(x[-3:-2], y[-3:-2],'bx')
 plt.plot(x1, y1,'ro')
 plt.plot(x2, y2, 'go')
 plt.legend(['NIFA', 'NIFA Optimized', 'Resfams Full', 'Resfams'])
