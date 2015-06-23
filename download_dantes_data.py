@@ -15,6 +15,8 @@ with open(filename, 'w') as f:
         data = Entrez.read(Entrez.efetch(db="nucleotide", id=id, rettype="gb", retmode="xml"))
         resistance = False
         product = id
+        definition = '-'.join(data[0]['GBSeq_definition'].split())
+        '''
         for elem in data[0]['GBSeq_feature-table']:
             if 'GBFeature_quals' in elem:
                 for e in elem['GBFeature_quals']:
@@ -25,6 +27,7 @@ with open(filename, 'w') as f:
                     if e['GBQualifier_name'] == 'product':
                         product = e['GBQualifier_value']
                         product = '_'.join(product.split())
-        f.write("> %s_%s_%s\n" % (str(resistance), product, id))
+        '''
+        f.write("> %s_%s\n" % (definition, id))
         # data[0]['GBSeq_definition'])
         f.write("%s\n" % data[0]['GBSeq_sequence'])
