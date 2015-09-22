@@ -1,24 +1,20 @@
-# This is to take the result of running counting what genes match a set of baits against the AMR database.
+# This is to take the result of counting what genes match a set of baits against the AMR database.
 # The goal is to calculate which baits are associated with what family so that we can print
 # out AMR family and how many baits will recognize that family. We may decide to enrich some baits
 # in order to deal with the some gene families that we know occur more often in our database.
+# We finally print out the summary for both gene class and resistance mechanism.
 
 '''
-For the protein case, we start with the hmmscan result file which
-maps protein gene name -> RF number
-metadata maps RF number -> ARO: number for resistance gene
-Use ontology to map ARO: number for resistance gene to list of genes based on is_a relationship
-Use ontology to find where any of these gene has "confers resistance to" relationship to ARO: antibiotic
-
-read protein fasta file to map protein gene name to dna gene name
-parse acronym for antibiotic_code to get ARO: for antibiotic
-Use ontology to walk is_a relationship for all other drugs
-compare these drugs with the list of antibiotics confer resistance to
+Internally, this reads the passed in tab separated file that lists genes and the number of baits
+that match that gene. This file may contain header lines scattered throught the file since it appeasr to be
+multiple files concatenated together. Also a gene will appear multiple times so we want to keep a running sum.
+This is stored in a dictionary.
+We then use the grouping file to map the gene name to ARO id.
+Given this ARO id we then use the ontology code to map the ARO id using the multiple inheritance is_a relationship.
 '''
 import sys
 import readers
 import collections
-import argparse
 
 import ontology_common
 
