@@ -29,20 +29,25 @@ def match(str1, str2):
     return True
 
 
-# for each sequence, see if there is a match with any consensus sequence
-amr = readers.read_fasta(file='../combined.fasta')
-#amr = readers.read_fasta(file='../test.combined.fasta')
-consensus = readers.read_fasta(file='../bait.fasta')
-#consensus = readers.read_fasta(file='../test.clstr.fasta')
-not_found = 0
-for name, gene in amr.items():
-    found = False
-    for cluster in consensus.values():
-        if match(gene, cluster):
-            found = True
-            break
-    if not found:
-        not_found += 1
-        print('Not found: %s' % name)
+def main():
+    # for each sequence, see if there is a match with any consensus sequence
+    amr = readers.read_fasta(file='../combined.fasta')
+    #amr = readers.read_fasta(file='../test.combined.fasta')
+    consensus = readers.read_fasta(file='../bait.fasta')
+    #consensus = readers.read_fasta(file='../test.clstr.fasta')
+    not_found = 0
+    for name, gene in amr.items():
+        found = False
+        for cluster in consensus.values():
+            if match(gene, cluster):
+                found = True
+                break
+        if not found:
+            not_found += 1
+            print('Not found: %s' % name)
 
-print(not_found)
+    print(not_found)
+
+
+if __name__ == '__main__':
+    main()

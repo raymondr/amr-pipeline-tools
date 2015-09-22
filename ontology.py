@@ -1,21 +1,34 @@
 # From a csv file, determine how many genes fall into each general category from CARD ontology
 import ontology_common
 import sys
+import argparse
 
 
 def get_inclusions():
-    with open(sys.argv[1]) as f:
+    parser = argparse.ArgumentParser(description="Filters a PSL file output from blat based on criteria in arguments")
+    parser.add_argument('--count', dest='count', default=False, action='store_const', const=True,
+                        help='Whether csv file contains counts')
+    parser.add_argument('-i', dest='file', required=True,
+                        help='The csv file')
+    parser.add_argument('-t', dest='tab', required=False, action='store_const', const=True,
+                        help='tab separated file')
+    args = parser.parse_args()
+    with open(args.file) as f:
         lines = f.readlines()
     ids = []
+    sep = '\t' if args.tab else ','
     for line in lines:
         line = line.rstrip('\n')
-        if sys.argv[2] == '--count':
-            id, cnt = line.split(',')
-            id = id.replace('ARO', 'ARO:')
-            for i in range(int(cnt)):
-                ids.append(id)
+        if args.count:
+            id, cnt = line.split(sep, 1)
+            cnt = cnt.strip()
+            try:
+                for i in range(int(cnt)):
+                    ids.append(id)
+            except ValueError:
+                continue
         else:
-            name, id = line.rsplit(',', 1)
+            name, id = line.rsplit(sep, 1)
             id = id.strip()
             ids.append(id)
     return ids
@@ -48,6 +61,7 @@ def categories(terms):
         total += m[1]
     for m in category_list:
         print('%s, %s, %d' % (m[0], m[1], float(m[1]) * 100.0 / total))
+    print(total)
 
 
 def get_category(id, terms):
@@ -60,7 +74,7 @@ def get_category(id, terms):
                     parent_id = t['is_a'][0].split()[0]
                     if parent_id == 'ARO:3000557':
                         parent_id = t['is_a'][1].split()[0]
-                    if parent_id == 'ARO:3000000':
+                    if parent_id == 'ARO:3000000' or parent_id == 'ARO:3000001' or parent_id == 'ARO:3000004' or parent_id == 'ARO:3000568':
                         return t
                     else:
                         t_id = parent_id
@@ -72,7 +86,7 @@ def get_category(id, terms):
 
 
 def main():
-    terms = ontology_common.parse_obo('../new_combined.obo')
+    terms = ontology_common.parse_obo('new_combined.obo')
     categories(terms)
 
 

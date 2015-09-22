@@ -99,3 +99,29 @@ def get_lineage(id, terms):
             yield "ARO:3000000"
         else:
             yield 'Unknown'
+
+
+def get_class(id, terms):
+        t_id_stack = [id]
+        while t_id_stack:
+            t_id = t_id_stack.pop(0)
+            if t_id in terms:
+                t = terms[t_id]
+                if 'is_a' in t:
+                    for is_a_node in t['is_a']:
+                        parent_id = is_a_node.split()[0]
+                        if parent_id == "ARO:3000000":
+                            yield t_id
+                        else:
+                            t_id_stack.append(parent_id)
+
+
+def get_resistance(lineage, terms):
+    drugs = set()
+    for id in lineage:
+        if id in terms and 'relationship' in terms[id]:
+            for relation in terms[id]['relationship']:
+                args = relation.split()
+                if args[0] in ['confers_resistance_to_drug', 'confers_resistance_to']:
+                    drugs.add(args[1])
+    return drugs

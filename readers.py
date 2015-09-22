@@ -1,4 +1,4 @@
-def read_fasta(file='../master_AMRdb.fa', shorten=False):
+def read_fasta(file='../master_AMRdb.fa', shorten=False, max_length_shorten=True):
     with open(file) as f:
         lines = f.readlines()
     name = None
@@ -16,7 +16,7 @@ def read_fasta(file='../master_AMRdb.fa', shorten=False):
                 long_name = name
                 if ' ' in name:
                     name = name.split()[0]
-                if len(name) > 19:
+                if len(name) > 19 and max_length_shorten:
                     name = name[:19]
                 name_map[name] = long_name
         else:
@@ -27,7 +27,7 @@ def read_fasta(file='../master_AMRdb.fa', shorten=False):
     return map
 
 
-def read_grouping(filename='../grouping.csv', short=False):
+def read_grouping(filename='../grouping.csv', short=False, map_name=False, strip_colon=True):
     with open(filename) as f:
         lines = f.readlines()
     id_to_name = {}
@@ -35,14 +35,18 @@ def read_grouping(filename='../grouping.csv', short=False):
         line = line.rstrip('\n')
         name, id = line.rsplit(',', 1)
         id = id.strip()
-        id = ''.join(id.split(':'))
+        if strip_colon:
+            id = ''.join(id.split(':'))
         name = name.strip('"').strip()
         if short and ' ' in name:
             name = name.split()[0]
-        if id not in id_to_name:
-            id_to_name[id] = [name]
+        if map_name:
+            id_to_name[name] = id
         else:
-            id_to_name[id].append(name)
+            if id not in id_to_name:
+                id_to_name[id] = [name]
+            else:
+                id_to_name[id].append(name)
     return id_to_name
 
 
@@ -134,3 +138,16 @@ def create_fasta_file_for_each_id(name_to_sequence, id_to_name, dir='seq', name_
                 fasta.write(name_to_sequence[name] + '\n')
 
 
+# since Resfams does not reliably include ARO number in description field, we need to use Resfams metadata
+# file to translate RF id to ARO id.
+def change_RF_to_ARO(scan_name_to_id):
+    rf_to_aro = {}
+    with open('resfams_metadata.txt') as f:
+        lines = f.readlines()
+    for line in lines[1:]:
+        fields = line.split('\t')
+        rf_to_aro[fields[0]] = fields[3]
+
+    for k, v in scan_name_to_id.items():
+        for item in v:
+            item[0] = rf_to_aro[item[0]]
