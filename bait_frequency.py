@@ -69,9 +69,17 @@ def main():
     print()
     total_baits = 0
     for k, v in baits_for_class.items():
-        print(terms[k]['name'], len(v))
-        total_baits += len(v)
-    print("Total baits for all genes", total_baits)
+        if 'resistance gene' in terms[k]['name'][0]:
+            print(terms[k]['name'][0], len(v))
+            total_baits += len(v)
+    print("Total counts for gene class ", total_baits)
+    print()
+    total_baits = 0
+    for k, v in baits_for_class.items():
+        if 'resistance gene' not in terms[k]['name'][0]:
+            print(terms[k]['name'][0], len(v))
+            total_baits += len(v)
+    print("Total counts for mechanism ", total_baits)
 
 if __name__ == '__main__':
     main()
