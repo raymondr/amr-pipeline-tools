@@ -28,7 +28,7 @@ def read_fsl(filename):
     with open(filename) as f:
         lines = f.readlines()
     skipped_matches = 0
-    for line in lines[1:]:
+    for line in lines[5:]:
         tokens = line.strip('\n').split('\t')
         if int(tokens[0]) < 120 * .4:
             skipped_matches += 1
